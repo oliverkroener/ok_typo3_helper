@@ -1,5 +1,5 @@
 <?php
-namespace OliverKroener\Helpers\Traits;
+namespace OliverKroener\Helpers\MSGraphApi;
 
 trait ReflectionPropertiesTrait
 {

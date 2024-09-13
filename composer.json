@@ -18,7 +18,7 @@
     },
     "extra": {
       "typo3/cms": {
-        "extension-key": "ok-helpers"
+        "extension-key": "ok_helpers"
       }
     },
     "config": {
