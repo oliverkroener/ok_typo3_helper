@@ -27,9 +27,13 @@ class MSGraphMailApiService
         // Create an Email object from the parsed MimeMessage
         $message = \ZBateson\MailMimeParser\Message::from($rawMessage->toString(), false);
 
+        // get subject
+        $subject = $message->getHeader('Subject');
+        if ($subject) $subject = $subject->getRawValue();
+
         $toRecipients = $message->getHeader('To');
 
-        foreach ($toRecipients->getAllParts() as $email) {
+        foreach ($toRecipients->getParts() as $email) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
             $emailAddress->setAddress($email->getValue());
@@ -83,7 +87,7 @@ class MSGraphMailApiService
         $graphMessage = new Message();
         $graphMessage->setFrom($from);
         $graphMessage->setToRecipients($toRecipientsArray);
-        $graphMessage->setSubject($message->getSubject() ?? 'No Subject');
+        $graphMessage->setSubject($subject ?? 'No Subject');
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
 

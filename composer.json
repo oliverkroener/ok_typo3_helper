@@ -1,5 +1,5 @@
 {
-    "name": "oliverkroener/ok-helpers",
+    "name": "oliverkroener/ok-typo3-helper",
     "type": "typo3-cms-extension",
     "description": "A TYPO3 extension with helper traits and utilities.",
     "authors": [
@@ -8,10 +8,11 @@
         "email": "ok@oliver-kroener.de"
       }
     ],
+    "version": "1.0.0",
     "require": {
-      "typo3/cms-core": "^11.5 || ^12.4",
+      "typo3/cms-core": "^11.5",
       "microsoft/microsoft-graph": "^2",
-      "zbateson/mail-mime-parser": "^3"
+      "zbateson/mail-mime-parser": "^2"
     },
     "autoload": {
       "psr-4": {
@@ -20,13 +21,12 @@
     },
     "extra": {
       "typo3/cms": {
-        "extension-key": "ok_helpers"
+        "extension-key": "ok_typo3_helper"
       }
     },
     "config": {
       "preferred-install": "dist"
     },
-    "version": "1.0.0",
     "license": "GPL-2.0-or-later"
   }
   
