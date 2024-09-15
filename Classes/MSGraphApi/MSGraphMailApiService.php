@@ -11,7 +11,6 @@ use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
 use Symfony\Component\Mime\RawMessage;
 
-
 class MSGraphMailApiService
 {
     public function __construct() {}
@@ -20,6 +19,7 @@ class MSGraphMailApiService
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
      *
      * @param RawMessage $rawMessage The raw message to convert.
+     * @param string $confFromEmail The email address to use for the "From" field.
      * @return Message Microsoft Graph-compatible message.
      */
     public static function convertToGraphMessage(RawMessage $rawMessage, string $confFromEmail): Message
@@ -27,8 +27,9 @@ class MSGraphMailApiService
         // Create an Email object from the parsed MimeMessage
         $message = \ZBateson\MailMimeParser\Message::from($rawMessage->toString(), false);
 
+        // Process "To" recipients
         $toRecipients = $message->getHeader('To');
-
+        $toRecipientsArray = [];
         foreach ($toRecipients->getAllParts() as $email) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
@@ -38,6 +39,49 @@ class MSGraphMailApiService
             $toRecipientsArray[] = $recipient;
         }
 
+        // Process "CC" recipients
+        $ccRecipients = $message->getHeader('Cc');
+        $ccRecipientsArray = [];
+        if ($ccRecipients !== null) {
+            foreach ($ccRecipients->getAllParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $ccRecipientsArray[] = $recipient;
+            }
+        }
+
+        // Process "BCC" recipients
+        $bccRecipients = $message->getHeader('Bcc');
+        $bccRecipientsArray = [];
+        if ($bccRecipients !== null) {
+            foreach ($bccRecipients->getAllParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $bccRecipientsArray[] = $recipient;
+            }
+        }
+
+        // Process "Reply-To" address
+        $replyToHeader = $message->getHeader('Reply-To');
+        $replyToArray = [];
+        if ($replyToHeader !== null) {
+            foreach ($replyToHeader->getAllParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $replyToArray[] = $recipient;
+            }
+        }
+
+        // Get message body
         $htmlBody = $message->getHtmlContent();
         $plainTextBody = $message->getTextContent();
 
@@ -83,6 +127,9 @@ class MSGraphMailApiService
         $graphMessage = new Message();
         $graphMessage->setFrom($from);
         $graphMessage->setToRecipients($toRecipientsArray);
+        $graphMessage->setCcRecipients($ccRecipientsArray);
+        $graphMessage->setBccRecipients($bccRecipientsArray);
+        $graphMessage->setReplyTo($replyToArray);
         $graphMessage->setSubject($message->getSubject() ?? 'No Subject');
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
