@@ -10,7 +10,8 @@
     ],
     "version": "1.0.0",
     "require": {
-      "typo3/cms-core": "^9.5",
+      "php": ">= 7.2",
+      "typo3/cms-core": "^9.5 || ^10.4",
       "microsoft/microsoft-graph": "^1",
       "zbateson/mail-mime-parser": "^2"
     },
