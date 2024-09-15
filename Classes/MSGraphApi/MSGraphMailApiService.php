@@ -3,12 +3,12 @@
 namespace OliverKroener\Helpers\MSGraphApi;
 
 use GuzzleHttp\Psr7\Utils;
-use Microsoft\Graph\Generated\Models\BodyType;
-use Microsoft\Graph\Generated\Models\EmailAddress;
-use Microsoft\Graph\Generated\Models\FileAttachment;
-use Microsoft\Graph\Generated\Models\ItemBody;
-use Microsoft\Graph\Generated\Models\Message;
-use Microsoft\Graph\Generated\Models\Recipient;
+use Microsoft\Graph\Model\BodyType;
+use Microsoft\Graph\Model\EmailAddress;
+use Microsoft\Graph\Model\FileAttachment;
+use Microsoft\Graph\Model\ItemBody;
+use Microsoft\Graph\Model\Message;
+use Microsoft\Graph\Model\Recipient;
 use Symfony\Component\Mime\RawMessage;
 
 
@@ -67,12 +67,12 @@ class MSGraphMailApiService
             $attachmentContent = $attachment->getContent();
 
             $fileAttachment = new FileAttachment();
+            $fileAttachment->setODataType('#microsoft.graph.fileAttachment');
             $fileAttachment->setName($attachmentName);
             $fileAttachment->setContentType($attachmentContentType);
 
             // Assuming your content is stored in $content
-            $stream = Utils::streamFor(base64_encode($attachmentContent));
-            $fileAttachment->setContentBytes($stream);
+            $fileAttachment->setContentBytes(base64_encode($attachmentContent));
 
             $fileAttachments[] = $fileAttachment;
         }

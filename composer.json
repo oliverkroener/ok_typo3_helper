@@ -10,8 +10,8 @@
     ],
     "version": "1.0.0",
     "require": {
-      "typo3/cms-core": "^11.5",
-      "microsoft/microsoft-graph": "^2",
+      "typo3/cms-core": "^10.4",
+      "microsoft/microsoft-graph": "^1",
       "zbateson/mail-mime-parser": "^2"
     },
     "autoload": {
