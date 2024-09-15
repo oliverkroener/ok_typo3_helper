@@ -8,8 +8,6 @@ use Microsoft\Graph\Model\FileAttachment;
 use Microsoft\Graph\Model\ItemBody;
 use Microsoft\Graph\Model\Message;
 use Microsoft\Graph\Model\Recipient;
-use Symfony\Component\Mime\RawMessage;
-
 
 class MSGraphMailApiService
 {
@@ -18,13 +16,13 @@ class MSGraphMailApiService
     /**
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
      *
-     * @param RawMessage $rawMessage The raw message to convert.
+     * @param string $rawMessage The raw message to convert.
      * @return Message Microsoft Graph-compatible message.
      */
-    public static function convertToGraphMessage(\Swift_Mime_Message $message, string $confFromEmail): Message
+    public static function convertToGraphMessage(string $rawMessage, string $confFromEmail): Message
     {
         // Create an Email object from the parsed MimeMessage
-        $message = \ZBateson\MailMimeParser\Message::from($message->toString(), false);
+        $message = \ZBateson\MailMimeParser\Message::from($rawMessage, false);
 
         // get subject
         $subject = $message->getHeader('Subject');
