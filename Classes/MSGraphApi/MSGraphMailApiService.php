@@ -2,7 +2,6 @@
 
 namespace OliverKroener\Helpers\MSGraphApi;
 
-use GuzzleHttp\Psr7\Utils;
 use Microsoft\Graph\Model\BodyType;
 use Microsoft\Graph\Model\EmailAddress;
 use Microsoft\Graph\Model\FileAttachment;
