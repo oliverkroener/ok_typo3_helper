@@ -1,7 +1,5 @@
 <?php
 
-defined('TYPO3') || die();
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Helpers',
     'description' => 'A TYPO3 extension with helper traits and utilities.',
