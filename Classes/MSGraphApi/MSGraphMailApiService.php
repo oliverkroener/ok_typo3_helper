@@ -21,10 +21,10 @@ class MSGraphMailApiService
      * @param RawMessage $rawMessage The raw message to convert.
      * @return Message Microsoft Graph-compatible message.
      */
-    public static function convertToGraphMessage(RawMessage $rawMessage, string $confFromEmail): Message
+    public static function convertToGraphMessage(\Swift_Mime_Message $message, string $confFromEmail): Message
     {
         // Create an Email object from the parsed MimeMessage
-        $message = \ZBateson\MailMimeParser\Message::from($rawMessage->toString(), false);
+        $message = \ZBateson\MailMimeParser\Message::from($message->toString(), false);
 
         // get subject
         $subject = $message->getHeader('Subject');

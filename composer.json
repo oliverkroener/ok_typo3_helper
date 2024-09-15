@@ -10,7 +10,7 @@
     ],
     "version": "1.0.0",
     "require": {
-      "typo3/cms-core": "^10.4",
+      "typo3/cms-core": "^9.5",
       "microsoft/microsoft-graph": "^1",
       "zbateson/mail-mime-parser": "^2"
     },
@@ -23,9 +23,6 @@
       "typo3/cms": {
         "extension-key": "ok_typo3_helper"
       }
-    },
-    "config": {
-      "preferred-install": "dist"
     },
     "license": "GPL-2.0-or-later"
   }
