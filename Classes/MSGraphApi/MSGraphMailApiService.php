@@ -17,6 +17,7 @@ class MSGraphMailApiService
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
      *
      * @param string $rawMessage The raw message to convert.
+     * @param string $confFromEmail The email address to use for the "From" field.
      * @return Message Microsoft Graph-compatible message.
      */
     public static function convertToGraphMessage(string $rawMessage, string $confFromEmail): Message
@@ -24,21 +25,67 @@ class MSGraphMailApiService
         // Create an Email object from the parsed MimeMessage
         $message = \ZBateson\MailMimeParser\Message::from($rawMessage, false);
 
-        // get subject
+        // Get subject
         $subject = $message->getHeader('Subject');
         if ($subject) $subject = $subject->getRawValue();
 
+        // Process "To" recipients
         $toRecipients = $message->getHeader('To');
-
-        foreach ($toRecipients->getParts() as $email) {
-            $recipient = new Recipient();
-            $emailAddress = new EmailAddress();
-            $emailAddress->setAddress($email->getValue());
-            $emailAddress->setName($email->getName());
-            $recipient->setEmailAddress($emailAddress);
-            $toRecipientsArray[] = $recipient;
+        $toRecipientsArray = [];
+        if ($toRecipients !== null) {
+            foreach ($toRecipients->getParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $toRecipientsArray[] = $recipient;
+            }
         }
 
+        // Process "CC" recipients
+        $ccRecipients = $message->getHeader('Cc');
+        $ccRecipientsArray = [];
+        if ($ccRecipients !== null) {
+            foreach ($ccRecipients->getParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $ccRecipientsArray[] = $recipient;
+            }
+        }
+
+        // Process "BCC" recipients
+        $bccRecipients = $message->getHeader('Bcc');
+        $bccRecipientsArray = [];
+        if ($bccRecipients !== null) {
+            foreach ($bccRecipients->getParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $bccRecipientsArray[] = $recipient;
+            }
+        }
+
+        // Process "Reply-To" addresses
+        $replyToHeader = $message->getHeader('Reply-To');
+        $replyToArray = [];
+        if ($replyToHeader !== null) {
+            foreach ($replyToHeader->getParts() as $email) {
+                $recipient = new Recipient();
+                $emailAddress = new EmailAddress();
+                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setName($email->getName());
+                $recipient->setEmailAddress($emailAddress);
+                $replyToArray[] = $recipient;
+            }
+        }
+
+        // Get message body
         $htmlBody = $message->getHtmlContent();
         $plainTextBody = $message->getTextContent();
 
@@ -84,6 +131,9 @@ class MSGraphMailApiService
         $graphMessage = new Message();
         $graphMessage->setFrom($from);
         $graphMessage->setToRecipients($toRecipientsArray);
+        $graphMessage->setCcRecipients($ccRecipientsArray);
+        $graphMessage->setBccRecipients($bccRecipientsArray);
+        $graphMessage->setReplyTo($replyToArray);
         $graphMessage->setSubject($subject ?? 'No Subject');
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
