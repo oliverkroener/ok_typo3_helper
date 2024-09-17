@@ -54,13 +54,13 @@ class MSGraphMailApiService
         }
 
         // Process "BCC" recipients
-        $bccRecipients = $message->getHeader('Bcc');
+        $bccRecipients = $rawMessage->getBcc();
         $bccRecipientsArray = [];
         if ($bccRecipients !== null) {
-            foreach ($bccRecipients->getAllParts() as $email) {
+            foreach ($bccRecipients as $email) {
                 $recipient = new Recipient();
                 $emailAddress = new EmailAddress();
-                $emailAddress->setAddress($email->getValue());
+                $emailAddress->setAddress($email->getAddress());
                 $emailAddress->setName($email->getName());
                 $recipient->setEmailAddress($emailAddress);
                 $bccRecipientsArray[] = $recipient;
