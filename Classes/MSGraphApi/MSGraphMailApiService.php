@@ -9,8 +9,6 @@ use Microsoft\Graph\Generated\Models\FileAttachment;
 use Microsoft\Graph\Generated\Models\ItemBody;
 use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
-use Psr\Http\Message\Stream;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
 class MSGraphMailApiService
