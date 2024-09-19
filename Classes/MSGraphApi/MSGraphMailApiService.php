@@ -20,9 +20,9 @@ class MSGraphMailApiService
      *
      * @param RawMessage $rawMessage The raw message to convert.
      * @param string $confFromEmail The email address to use for the "From" field.
-     * @return Message Microsoft Graph-compatible message.
+     * @return array of (message, from) Microsoft Graph-compatible message.
      */
-    public static function convertToGraphMessage(RawMessage $rawMessage, string $confFromEmail): Message
+    public static function convertToGraphMessage(RawMessage $rawMessage): array
     {
         // Convert RawMessage to Email object
         $email = $rawMessage;
@@ -36,8 +36,8 @@ class MSGraphMailApiService
             $address = $fromAddresses[0];
             $fromEmail->setAddress($address->getAddress());
             $fromEmail->setName($address->getName());
-        } else {
-            $fromEmail->setAddress($confFromEmail); // Fallback to configured "From" email
+
+            $fromAddress = $address->getAddress();
         }
 
         $from->setEmailAddress($fromEmail);
@@ -129,6 +129,9 @@ class MSGraphMailApiService
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
 
-        return $graphMessage;
+        return [ 
+            'message' => $graphMessage,
+            'from' => $fromAddress
+        ];
     }
 }
