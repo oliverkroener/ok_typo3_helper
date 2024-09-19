@@ -9,6 +9,7 @@ use Microsoft\Graph\Model\FileAttachment;
 use Microsoft\Graph\Model\ItemBody;
 use Microsoft\Graph\Model\Message;
 use Microsoft\Graph\Model\Recipient;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
 class MSGraphMailApiService
@@ -106,17 +107,31 @@ class MSGraphMailApiService
         // Process attachments
         $fileAttachments = [];
         foreach ($email->getAttachments() as $attachment) {
-            $attachmentName = $attachment->getFilename();
-            $attachmentContentType = $attachment->getContentType();
+            // Get the prepared headers from the attachment
+            $preparedHeaders = $attachment->getPreparedHeaders();
+        
+            // Retrieve the attachment's filename
+            // Attempt to obtain the 'name' parameter from the 'Content-Disposition' header
+            $contentDispositionHeader = $preparedHeaders->get('Content-Disposition');
+            $attachmentName = $contentDispositionHeader->getParameter('name');
+        
+            // Determine the content type of the attachment
+            // Access the 'Content-Type' header
+            $contentTypeHeader = $preparedHeaders->get('Content-Type');
+            $attachmentContentType = $contentTypeHeader->getValue() ?? 'text/plain';
+        
+            // Extract the body/content of the attachment
             $attachmentContent = $attachment->getBody();
-
+        
             $fileAttachment = new FileAttachment();
+            $fileAttachment->setODataType("#microsoft.graph.fileAttachment");
             $fileAttachment->setName($attachmentName);
             $fileAttachment->setContentType($attachmentContentType);
-            $fileAttachment->setContentBytes(Utils::streamFor(base64_encode($attachmentContent)));
-
+            $fileAttachment->setContentBytes(base64_encode($attachmentContent));
+        
             $fileAttachments[] = $fileAttachment;
         }
+        
 
         // Construct the message object
         $graphMessage = new Message();
@@ -129,7 +144,7 @@ class MSGraphMailApiService
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
 
-        return [ 
+        return [
             'message' => $graphMessage,
             'from' => $fromAddress
         ];
