@@ -9,7 +9,7 @@ use Microsoft\Graph\Generated\Models\FileAttachment;
 use Microsoft\Graph\Generated\Models\ItemBody;
 use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
-use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mime\Email;
 
 class MSGraphMailApiService
 {
@@ -18,11 +18,10 @@ class MSGraphMailApiService
     /**
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
      *
-     * @param RawMessage $rawMessage The raw message to convert.
-     * @param string $confFromEmail The email address to use for the "From" field.
+     * @param Email $rawMessage The raw message to convert.
      * @return array of (message, from) Microsoft Graph-compatible message.
      */
-    public static function convertToGraphMessage(RawMessage $rawMessage): array
+    public static function convertToGraphMessage(Email $rawMessage): array
     {
         // Convert RawMessage to Email object
         $email = $rawMessage;
