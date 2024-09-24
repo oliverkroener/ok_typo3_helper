@@ -7,3 +7,9 @@ services:
   # Autoload all services
   OliverKroener\Helpers\:
     resource: '../Classes/*'
+
+  OliverKroener\Helpers\Service\SiteRootService:
+    public: true
+    autowire: true
+    autoconfigure: true
+    tags: ['singleton']
