@@ -14,41 +14,16 @@
 
 ## Installation
 
-1. Install the extension via composer:
+Install the extension via composer:
    ```bash
    composer require oliverkroener/ok_typo3_helper
    ```
-2. Activate the extension in the TYPO3 backend under **Admin Tools → Extensions**.
-
----
-
-## Usage
-
-### Mailer Service
-
-```php
-use OliverKroener\OkTypo3Helper\Service\MailerService;
-
-// Example of sending an email
-$mailer = GeneralUtility::makeInstance(MailerService::class);
-$mailer->send(
-    'recipient@example.com',
-    'Subject Line',
-    'This is the email body',
-    ['sender@example.com' => 'Sender Name']
-);
-```
-
-### Utilities
-
-Refer to the [documentation](#documentation) for more examples of the utilities provided by the extension.
 
 ---
 
 ## Compatibility
 
-- TYPO3 Version: 12.x and above
-- PHP Version: 8.1 and above
+- TYPO3 Version: 9.x and above
 
 ---
 
@@ -67,13 +42,6 @@ Refer to the [documentation](#documentation) for more examples of the utilities 
    ```
 3. Set up in your TYPO3 instance as a local extension.
 
-### Testing
-
-Run tests using PHPUnit:
-```bash
-composer test
-```
-
 ---
 
 ## Contributing
@@ -84,15 +52,17 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## Author
 
-- **Oliver Kroener**  
-  [ok@oliver-kroener.de](mailto:ok@oliver-kroener.de)  
-  [https://www.oliver-kroener.de](https://www.oliver-kroener.de)
+**Oliver Kroener**  
+
+[ok@oliver-kroener.de](mailto:ok@oliver-kroener.de)  
+[https://www.oliver-kroener.de](https://www.oliver-kroener.de)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v2.0 (GPL-2.0).  
+You can find the full license text in the [LICENSE](LICENSE) file or visit [https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html](https://www.gnu.org/licenses/old-licenses/gpl-2
 
 ---
 
@@ -103,6 +73,3 @@ For detailed usage examples and API references, please refer to the [official do
 ---
 
 Happy Coding!
-```
-
-This README reflects the correct `vendor` as `OliverKroener` and the extension name as `ok_typo3_helper`. Let me know if there's anything else you'd like to add!
