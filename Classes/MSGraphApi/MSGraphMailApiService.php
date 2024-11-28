@@ -105,8 +105,10 @@ class MSGraphMailApiService
         // Process attachments
         $fileAttachments = [];
         foreach ($email->getAttachments() as $attachment) {
-            $attachmentName = $attachment->getFilename();
-            $attachmentContentType = $attachment->getContentType();
+            $headers = $attachment->getPreparedHeaders();
+            $contentDispositionHeader = $headers->get('Content-Disposition');
+            $attachmentName = $contentDispositionHeader->getParameter('filename');
+            $attachmentContentType = $attachment->getMediaType() . "/" . $attachment->getMediaSubType();
             $attachmentContent = $attachment->getBody();
 
             $fileAttachment = new FileAttachment();
