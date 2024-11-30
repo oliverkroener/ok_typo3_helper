@@ -10,6 +10,7 @@ use Microsoft\Graph\Generated\Models\ItemBody;
 use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
 use Symfony\Component\Mime\Email;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class MSGraphMailApiService
 {
@@ -105,9 +106,18 @@ class MSGraphMailApiService
         // Process attachments
         $fileAttachments = [];
         foreach ($email->getAttachments() as $attachment) {
-            $headers = $attachment->getPreparedHeaders();
-            $contentDispositionHeader = $headers->get('Content-Disposition');
-            $attachmentName = $contentDispositionHeader->getParameter('filename');
+            $attachmentName = "";
+
+            $currentVersion = VersionNumberUtility::getNumericTypo3Version();
+
+            if (version_compare($currentVersion, "12.4.0", ">=")) {
+                $attachmentName = $attachment->getFilename();
+            } else {
+                $headers = $attachment->getPreparedHeaders();
+                $contentDispositionHeader = $headers->get('Content-Disposition');
+                $attachmentName = $contentDispositionHeader->getParameter('filename');
+            }
+            
             $attachmentContentType = $attachment->getMediaType() . "/" . $attachment->getMediaSubType();
             $attachmentContent = $attachment->getBody();
 
