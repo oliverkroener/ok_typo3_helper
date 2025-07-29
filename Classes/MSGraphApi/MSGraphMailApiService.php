@@ -128,6 +128,21 @@ class MSGraphMailApiService
             $fileAttachment->setContentType($attachmentContentType);
             $fileAttachment->setContentBytes(Utils::streamFor(base64_encode($attachmentContent)));
 
+            // Check if this is an inline attachment by examining Content-Disposition
+            $isInline = false;
+            if ($contentDispositionHeader !== null) {
+                $disposition = $contentDispositionHeader->getValue();
+                if (stripos($disposition, 'inline') !== false) {
+                    $isInline = true;
+                }
+            }
+
+            // Set inline properties for Microsoft Graph API
+            if ($isInline) {
+                $fileAttachment->setIsInline(true);
+                // Microsoft Graph will generate a Content-ID if needed
+            }
+
             $fileAttachments[] = $fileAttachment;
         }
 
