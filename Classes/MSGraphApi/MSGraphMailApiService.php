@@ -71,59 +71,32 @@ class MSGraphMailApiService
 
             // Determine the email body content and type
             $body = new ItemBody();
+            $contentType = $email->getContentType();
 
-            // Iterate through the parts to find text/html and text/plain
-            foreach ($email->getChildren() as $part) {
-                /** @var \Swift_MimePart $part */
-                if ($part->getContentType() === 'text/html') {
-                    $body->setContentType(BodyType::HTML);
-                    $body->setContent($part->getBody());
-                    break; // Prefer HTML over plain text
-                }
-            }
-
-            // If HTML body not found, fallback to plain text
-            if (empty($body->getContent())) {
-                foreach ($email->getChildren() as $part) {
-                    if ($part->getContentType() === 'text/plain') {
-                        $body->setContentType(BodyType::TEXT);
-                        $body->setContent($part->getBody());
-                        break;
-                    }
-                }
-            }
-
-            // If still empty, set default empty plain text
-            if (empty($body->getContent())) {
+            if ($contentType === 'text/html') {
+                $body->setContentType(BodyType::HTML);
+                $body->setContent($email->getBody());
+            } else {
                 $body->setContentType(BodyType::TEXT);
-                $body->setContent('');
-                $logger->warning('Email body is empty. Setting default empty plain text.');
+                $body->setContent($email->getBody());
             }
 
             // Initialize an array to hold file attachments
             $fileAttachments = [];
 
             // Iterate through each attachment in the email
-            /** @var Swift_Attachment $attachment */
             foreach ($email->getChildren() as $attachment) {
                 if ($attachment instanceof Swift_Attachment) {
-                    // Retrieve the attachment's filename
                     $attachmentName = $attachment->getFilename() ?: 'attachment';
-
-                    // Determine the content type of the attachment
                     $attachmentContentType = $attachment->getContentType() ?: 'application/octet-stream';
-
-                    // Extract the body/content of the attachment
                     $attachmentContent = $attachment->getBody();
 
-                    // Create a new FileAttachment object for Microsoft Graph
                     $fileAttachment = new FileAttachment();
                     $fileAttachment->setODataType("#microsoft.graph.fileAttachment");
                     $fileAttachment->setName($attachmentName);
                     $fileAttachment->setContentType($attachmentContentType);
                     $fileAttachment->setContentBytes(base64_encode($attachmentContent));
 
-                    // Add the attachment to the array
                     $fileAttachments[] = $fileAttachment;
                 }
             }
