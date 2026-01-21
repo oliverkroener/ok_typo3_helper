@@ -9,7 +9,7 @@
       }
     ],
     "require": {
-      "typo3/cms-core": "^12 || ^13",
+      "typo3/cms-core": "^12 || ^13 || ^14",
       "microsoft/microsoft-graph": "^2",
       "zbateson/mail-mime-parser": "^3"
     },
@@ -23,7 +23,7 @@
         "extension-key": "ok_typo3_helper"
       }
     },
-    "version": "3.0.6",
+    "version": "3.1.0",
     "license": "GPL-2.0-or-later"
   }
   
