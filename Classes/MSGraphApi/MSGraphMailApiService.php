@@ -10,12 +10,27 @@ use Microsoft\Graph\Generated\Models\ItemBody;
 use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
 use Symfony\Component\Mailer\SentMessage;
-use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Header\AddressHeader;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
+use ZBateson\MailMimeParser\Header\IHeader;
+use ZBateson\MailMimeParser\Header\ParameterHeader;
+use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Message\IMimePart;
 
 class MSGraphMailApiService
 {
     public function __construct() {}
+
+    /**
+     * Resolves the address parts of a header, tolerating missing or
+     * non-address headers by returning an empty list.
+     *
+     * @return \ZBateson\MailMimeParser\Header\Part\AddressPart[]
+     */
+    private static function extractAddresses(?IHeader $header): array
+    {
+        return $header instanceof AddressHeader ? $header->getAddresses() : [];
+    }
 
     /**
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
@@ -35,15 +50,18 @@ class MSGraphMailApiService
         $fromAddress = $message->getHeaderValue(HeaderConsts::FROM);
 
         if (!empty($fromAddress)) {
-            $fromEmail->setAddress($message->getHeaderValue(HeaderConsts::FROM)); 
-            $fromEmail->setName($message->getHeader(HeaderConsts::FROM)->getPersonName());
+            $fromEmail->setAddress($fromAddress);
+            $fromHeader = $message->getHeader(HeaderConsts::FROM);
+            if ($fromHeader instanceof AddressHeader) {
+                $fromEmail->setName($fromHeader->getPersonName());
+            }
         }
 
         $from->setEmailAddress($fromEmail);
 
         // Process "To" recipients
         $toRecipientsArray = [];
-        foreach ($message->getHeader(HeaderConsts::TO)->getAddresses() ?? [] as $address) {
+        foreach (self::extractAddresses($message->getHeader(HeaderConsts::TO)) as $address) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
             $emailAddress->setAddress($address->getValue());
@@ -54,8 +72,7 @@ class MSGraphMailApiService
 
         // Process "CC" recipients
         $ccRecipientsArray = [];
-        $addresses = $message->getHeader(HeaderConsts::CC)?->getAddresses() ?? [];
-        foreach ($addresses as $address) {
+        foreach (self::extractAddresses($message->getHeader(HeaderConsts::CC)) as $address) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
             $emailAddress->setAddress($address->getValue());
@@ -66,8 +83,7 @@ class MSGraphMailApiService
 
         // Process "BCC" recipients
         $bccRecipientsArray = [];
-        $addresses = $message->getHeader(HeaderConsts::BCC)?->getAddresses() ?? [];
-        foreach ($addresses as $address) {
+        foreach (self::extractAddresses($message->getHeader(HeaderConsts::BCC)) as $address) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
             $emailAddress->setAddress($address->getValue());
@@ -78,8 +94,7 @@ class MSGraphMailApiService
 
         // Process "Reply-To" address
         $replyToArray = [];
-        $addresses = $message->getHeader(HeaderConsts::REPLY_TO)?->getAddresses() ?? [];
-        foreach ($addresses as $address) {
+        foreach (self::extractAddresses($message->getHeader(HeaderConsts::REPLY_TO)) as $address) {
             $recipient = new Recipient();
             $emailAddress = new EmailAddress();
             $emailAddress->setAddress($address->getValue());
@@ -107,16 +122,22 @@ class MSGraphMailApiService
 
         // Process attachments
         $fileAttachments = [];
-        foreach ($message->getAllAttachmentParts() ?? [] as $attachment) {
-            $attachmentName = "";
+        foreach ($message->getAllAttachmentParts() as $attachment) {
+            // Header/content-disposition access below is defined on IMimePart;
+            // non-mime parts carry no headers and are not valid attachments here.
+            if (!$attachment instanceof IMimePart) {
+                continue;
+            }
+
+            $attachmentName = '';
 
             $attachmentContentType = $attachment->getHeaderValue(HeaderConsts::CONTENT_TYPE);
             $contentDispositionHeader = $attachment->getHeader(HeaderConsts::CONTENT_DISPOSITION);
 
-            if ($contentDispositionHeader !== null) {
+            if ($contentDispositionHeader instanceof ParameterHeader) {
                 $attachmentName = $contentDispositionHeader->getValueFor('filename');
             }
-            
+
             $attachmentContent = $attachment->getContent();
 
             $fileAttachment = new FileAttachment();
@@ -126,7 +147,7 @@ class MSGraphMailApiService
 
             // Check if this is an inline attachment by examining Content-Disposition
             $isInline = false;
-            if ($contentDispositionHeader !== null) {
+            if ($contentDispositionHeader instanceof ParameterHeader) {
                 $disposition = $contentDispositionHeader->getValue();
                 if (stripos($disposition, 'inline') !== false) {
                     $isInline = true;
@@ -156,9 +177,9 @@ class MSGraphMailApiService
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
 
-        return [ 
+        return [
             'message' => $graphMessage,
-            'from' => $fromAddress
+            'from' => $fromAddress,
         ];
     }
 }
