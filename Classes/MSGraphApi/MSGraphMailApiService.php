@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use Symfony\Component\Mailer\SentMessage;
 use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
+use ZBateson\MailMimeParser\Header\ParameterHeader;
 
 class MSGraphMailApiService
 {
@@ -129,10 +130,10 @@ class MSGraphMailApiService
             $attachmentContentType = $attachment->getHeaderValue(HeaderConsts::CONTENT_TYPE);
             $contentDispositionHeader = $attachment->getHeader(HeaderConsts::CONTENT_DISPOSITION);
 
-            if ($contentDispositionHeader !== null) {
+            if ($contentDispositionHeader instanceof ParameterHeader) {
                 $attachmentName = $contentDispositionHeader->getValueFor('filename');
             }
-            
+
             $attachmentContent = $attachment->getContent();
 
             $fileAttachment = new FileAttachment();
@@ -140,6 +141,24 @@ class MSGraphMailApiService
             $fileAttachment->setName($attachmentName);
             $fileAttachment->setContentType($attachmentContentType);
             $fileAttachment->setContentBytes(Utils::streamFor(base64_encode($attachmentContent)));
+
+            // Check if this is an inline attachment by examining Content-Disposition
+            $isInline = false;
+            if ($contentDispositionHeader instanceof ParameterHeader) {
+                $disposition = $contentDispositionHeader->getValue();
+                if (stripos($disposition, 'inline') !== false) {
+                    $isInline = true;
+                }
+            }
+
+            // Set inline properties for Microsoft Graph API
+            if ($isInline) {
+                $fileAttachment->setIsInline(true);
+                // Graph does not auto-generate a Content-ID matching the "cid:"
+                // reference in the HTML body — it must be carried over or the
+                // inline image renders broken. getContentId() already strips <>.
+                $fileAttachment->setContentId($attachment->getContentId());
+            }
 
             $fileAttachments[] = $fileAttachment;
         }
