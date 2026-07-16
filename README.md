@@ -3,7 +3,7 @@
 [![TYPO3 10](https://img.shields.io/badge/TYPO3-10-orange?logo=typo3)](https://get.typo3.org/version/10)
 [![PHP 7.2+](https://img.shields.io/badge/PHP-7.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-[![Version](https://img.shields.io/badge/version-2.0.0-green)](https://github.com/oliverkroener/ok_typo3_helper)
+[![Version](https://img.shields.io/badge/version-2.0.2-green)](https://github.com/oliverkroener/ok_typo3_helper)
 [![Microsoft Graph](https://img.shields.io/badge/Microsoft%20Graph-API-0078D4?logo=microsoft)](https://learn.microsoft.com/en-us/graph/)
 
 Reusable helper traits and utilities for TYPO3 — including a Microsoft Graph mail conversion service that turns a Symfony `SentMessage` into a Graph-ready message object.
