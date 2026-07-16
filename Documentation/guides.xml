@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- See  https://docs.typo3.org/permalink/h2document:guides-xml for documentation on this file-->
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+        links-are-relative="true"
+        default-code-language="php"
+        input-format="rst"
+>
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               project-home="https://extensions.typo3.org/extension/ok_typo3_helper"
+               project-contact="https://github.com/oliverkroener/ok_typo3_helper/discussions"
+               project-repository="https://github.com/oliverkroener/ok_typo3_helper"
+               project-issues="https://github.com/oliverkroener/ok_typo3_helper/issues"
+               project-discussions="https://github.com/oliverkroener/ok_typo3_helper/discussions"
+               edit-on-github-branch="main"
+               edit-on-github="oliverkroener/ok_typo3_helper"
+               typo3-core-preferred="14.3"
+               interlink-shortcode="oliverkroener/ok-typo3-helper"
+    />
+    <project title="TYPO3 Helpers"
+             version="2.0"
+             release="2.0.1"
+             copyright="since 2024 by Oliver Kroener &amp; Contributors"/>
+    <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"/>
+</guides>

@@ -1,0 +1,3 @@
+..  Comment: Global include file with reusable substitutions and roles.
+
+..  |release| replace:: 2.0.1
