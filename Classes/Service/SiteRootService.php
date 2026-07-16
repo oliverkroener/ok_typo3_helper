@@ -2,9 +2,9 @@
 
 namespace OliverKroener\Helpers\Service;
 
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 
 class SiteRootService implements SingletonInterface
 {
@@ -39,8 +39,7 @@ class SiteRootService implements SingletonInterface
             $rootPageId = $site->getRootPageId();
 
             return $rootPageId;
-        } 
-        catch (SiteNotFoundException $e) {
+        } catch (SiteNotFoundException $e) {
             return null;
         }
     }

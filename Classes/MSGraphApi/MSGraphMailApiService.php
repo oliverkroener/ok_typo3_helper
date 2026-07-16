@@ -9,11 +9,12 @@ use Microsoft\Graph\Generated\Models\FileAttachment;
 use Microsoft\Graph\Generated\Models\ItemBody;
 use Microsoft\Graph\Generated\Models\Message;
 use Microsoft\Graph\Generated\Models\Recipient;
-use Symfony\Component\Mime\Email;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use Symfony\Component\Mailer\SentMessage;
-use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Header\AddressHeader;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
+use ZBateson\MailMimeParser\Header\ParameterHeader;
+use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Message\IMimePart;
 
 class MSGraphMailApiService
 {
@@ -22,7 +23,7 @@ class MSGraphMailApiService
     /**
      * Converts a parsed email data into a Microsoft Graph-compatible message object.
      *
-     * @param Email $rawMessage The raw message to convert.
+     * @param SentMessage $rawMessage The raw message to convert.
      * @return array of (message, from) Microsoft Graph-compatible message.
      */
     public static function convertToGraphMessage(SentMessage $rawMessage): array
@@ -36,8 +37,8 @@ class MSGraphMailApiService
 
         $fromHeader = $message->getHeader(HeaderConsts::FROM);
         $fromAddress = '';
-        
-        if ($fromHeader !== null) {
+
+        if ($fromHeader instanceof AddressHeader) {
             $fromAddresses = $fromHeader->getAddresses();
             if (!empty($fromAddresses)) {
                 $firstFromAddress = $fromAddresses[0];
@@ -52,7 +53,7 @@ class MSGraphMailApiService
         // Process "To" recipients
         $toRecipientsArray = [];
         $toHeader = $message->getHeader(HeaderConsts::TO);
-        if ($toHeader !== null) {
+        if ($toHeader instanceof AddressHeader) {
             foreach ($toHeader->getAddresses() as $address) {
                 $recipient = new Recipient();
                 $emailAddress = new EmailAddress();
@@ -66,7 +67,7 @@ class MSGraphMailApiService
         // Process "CC" recipients
         $ccRecipientsArray = [];
         $ccHeader = $message->getHeader(HeaderConsts::CC);
-        if ($ccHeader !== null) {
+        if ($ccHeader instanceof AddressHeader) {
             foreach ($ccHeader->getAddresses() as $address) {
                 $recipient = new Recipient();
                 $emailAddress = new EmailAddress();
@@ -80,7 +81,7 @@ class MSGraphMailApiService
         // Process "BCC" recipients
         $bccRecipientsArray = [];
         $bccHeader = $message->getHeader(HeaderConsts::BCC);
-        if ($bccHeader !== null) {
+        if ($bccHeader instanceof AddressHeader) {
             foreach ($bccHeader->getAddresses() as $address) {
                 $recipient = new Recipient();
                 $emailAddress = new EmailAddress();
@@ -94,7 +95,7 @@ class MSGraphMailApiService
         // Process "Reply-To" address
         $replyToArray = [];
         $replyToHeader = $message->getHeader(HeaderConsts::REPLY_TO);
-        if ($replyToHeader !== null) {
+        if ($replyToHeader instanceof AddressHeader) {
             foreach ($replyToHeader->getAddresses() as $address) {
                 $recipient = new Recipient();
                 $emailAddress = new EmailAddress();
@@ -124,24 +125,46 @@ class MSGraphMailApiService
 
         // Process attachments
         $fileAttachments = [];
-        foreach ($message->getAllAttachmentParts() ?? [] as $attachment) {
-            $attachmentName = "";
+        foreach ($message->getAllAttachmentParts() as $attachment) {
+            // Header/content-disposition access below is defined on IMimePart;
+            // non-mime parts carry no headers and are not valid attachments here.
+            if (!$attachment instanceof IMimePart) {
+                continue;
+            }
 
-            $currentVersion = VersionNumberUtility::getNumericTypo3Version();
+            $attachmentName = '';
 
             $attachmentContentType = $attachment->getHeaderValue(HeaderConsts::CONTENT_TYPE);
             $contentDispositionHeader = $attachment->getHeader(HeaderConsts::CONTENT_DISPOSITION);
 
-            if ($contentDispositionHeader !== null) {
+            if ($contentDispositionHeader instanceof ParameterHeader) {
                 $attachmentName = $contentDispositionHeader->getValueFor('filename');
             }
-            
+
             $attachmentContent = $attachment->getContent();
 
             $fileAttachment = new FileAttachment();
             $fileAttachment->setName($attachmentName);
             $fileAttachment->setContentType($attachmentContentType);
             $fileAttachment->setContentBytes(Utils::streamFor(base64_encode($attachmentContent)));
+
+            // Check if this is an inline attachment by examining Content-Disposition
+            $isInline = false;
+            if ($contentDispositionHeader instanceof ParameterHeader) {
+                $disposition = $contentDispositionHeader->getValue();
+                if (stripos($disposition, 'inline') !== false) {
+                    $isInline = true;
+                }
+            }
+
+            // Set inline properties for Microsoft Graph API
+            if ($isInline) {
+                $fileAttachment->setIsInline(true);
+                // Graph does not auto-generate a Content-ID matching the "cid:"
+                // reference in the HTML body — it must be carried over or the
+                // inline image renders broken. getContentId() already strips <>.
+                $fileAttachment->setContentId($attachment->getContentId());
+            }
 
             $fileAttachments[] = $fileAttachment;
         }
@@ -157,9 +180,9 @@ class MSGraphMailApiService
         $graphMessage->setBody($body);
         $graphMessage->setAttachments($fileAttachments);
 
-        return [ 
+        return [
             'message' => $graphMessage,
-            'from' => $fromAddress
+            'from' => $fromAddress,
         ];
     }
 }

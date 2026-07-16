@@ -1,0 +1,27 @@
+# PHPStan configuration for ok_typo3_helper.
+#
+# Run from the parent project root (phpstan + saschaegerer/phpstan-typo3 are
+# installed there as dev dependencies):
+#
+#   ddev exec vendor/bin/phpstan analyse -c packages/ok_typo3_helper/phpstan.neon
+#
+# saschaegerer/phpstan-typo3 is auto-registered via phpstan/extension-installer.
+parameters:
+    level: 5
+    # The trait "used zero times" notice only surfaces in some analysis
+    # contexts; keep the ignore below tolerant so it doesn't error when absent.
+    reportUnmatchedIgnoredErrors: false
+    paths:
+        - %currentWorkingDirectory%/packages/ok_typo3_helper/Classes
+        - %currentWorkingDirectory%/packages/ok_typo3_helper/ext_emconf.php
+        - %currentWorkingDirectory%/packages/ok_typo3_helper/ext_localconf.php
+    ignoreErrors:
+        # TYPO3 core defines $_EXTKEY when it includes ext_emconf.php.
+        -
+            message: '#Variable \$_EXTKEY might not be defined\.#'
+            path: %currentWorkingDirectory%/packages/ok_typo3_helper/ext_emconf.php
+        # ReflectionPropertiesTrait is a public API mixin consumed by other
+        # extensions; PHPStan analyses traits in isolation and cannot see usage.
+        -
+            message: '#Trait OliverKroener\\Helpers\\Traits\\ReflectionPropertiesTrait is used zero times and is not analysed\.#'
+            path: %currentWorkingDirectory%/packages/ok_typo3_helper/Classes/Traits/ReflectionPropertiesTrait.php
