@@ -8,3 +8,10 @@ parameters:
     phpVersion: 70200
     paths:
         - Classes
+    ignoreErrors:
+        # microsoft/microsoft-graph v1 declares setContentBytes() with the concrete
+        # GuzzleHttp\Psr7\Stream, but Utils::streamFor() is typed to return the
+        # StreamInterface (a Stream at runtime). Third-party typing quirk, not our bug.
+        -
+            message: '#Parameter \#1 \$val of method Microsoft\\Graph\\Model\\FileAttachment::setContentBytes\(\) expects GuzzleHttp\\Psr7\\Stream, Psr\\Http\\Message\\StreamInterface given\.#'
+            path: Classes/MSGraphApi/MSGraphMailApiService.php

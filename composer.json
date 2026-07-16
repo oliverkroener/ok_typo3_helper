@@ -36,6 +36,16 @@
         "extension-key": "ok_typo3_helper"
       }
     },
-    "license": "GPL-2.0-or-later"
-  }
-  
+    "license": "GPL-2.0-or-later",
+    "config": {
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        },
+        "allow-plugins": {
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true
+        }
+    }
+}

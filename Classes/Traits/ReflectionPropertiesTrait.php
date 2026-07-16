@@ -1,4 +1,5 @@
 <?php
+
 namespace OliverKroener\Helpers\Traits;
 
 trait ReflectionPropertiesTrait
@@ -16,7 +17,8 @@ trait ReflectionPropertiesTrait
         if (preg_match('/^get(.+)$/', $name, $matches)) {
             $property = lcfirst($matches[1]);
             return $this->getProperty($property);
-        } elseif (preg_match('/^set(.+)$/', $name, $matches)) {
+        }
+        if (preg_match('/^set(.+)$/', $name, $matches)) {
             $property = lcfirst($matches[1]);
             return $this->setProperty($property, $arguments[0]);
         }
