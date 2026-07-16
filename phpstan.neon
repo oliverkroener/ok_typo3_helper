@@ -1,0 +1,10 @@
+includes:
+    - vendor/saschaegerer/phpstan-typo3/extension.neon
+    # Uncomment after generating a baseline with: composer run stan:baseline
+    # - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    phpVersion: 70200
+    paths:
+        - Classes
