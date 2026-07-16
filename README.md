@@ -3,7 +3,7 @@
 [![TYPO3 11](https://img.shields.io/badge/TYPO3-11-orange?logo=typo3)](https://get.typo3.org/version/11)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-[![Version](https://img.shields.io/badge/version-2.0.1-green)](https://github.com/oliverkroener/ok_typo3_helper)
+[![Version](https://img.shields.io/badge/version-2.1.0-green)](https://github.com/oliverkroener/ok_typo3_helper)
 
 A TYPO3 extension by Oliver Kroener providing reusable helper services, traits and utilities to streamline the development of other TYPO3 extensions.
 
