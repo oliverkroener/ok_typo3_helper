@@ -1,13 +1,119 @@
-### TYPO3 Helpers
+# TYPO3 Helpers (`ok_typo3_helper`)
 
-The "TYPO3 helpers" extension, created by Oliver Kroener [https://www.oliver-kroener.de](https://www.oliver-kroener.de), enhances the TYPO3 CMS by providing various utility functions and productivity tools, specifically designed to integrate Microsoft 365 services such as Outlook, Teams, and OneDrive. It simplifies interactions with the Microsoft Graph API, allowing TYPO3 users to easily manage emails, calendar events, and contacts. By encapsulating complex API operations into straightforward, reusable functions, this extension reduces development time and effort, facilitating seamless connectivity between TYPO3 and Microsoft’s productivity suite.
+[![TYPO3 10](https://img.shields.io/badge/TYPO3-10-orange?logo=typo3)](https://get.typo3.org/version/10)
+[![PHP 7.2+](https://img.shields.io/badge/PHP-7.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![Version](https://img.shields.io/badge/version-2.0.0-green)](https://github.com/oliverkroener/ok_typo3_helper)
+[![Microsoft Graph](https://img.shields.io/badge/Microsoft%20Graph-API-0078D4?logo=microsoft)](https://learn.microsoft.com/en-us/graph/)
 
-Beyond its API integration capabilities, the "TYPO3 helpers" extension also offers numerous enhancements tailored for TYPO3 environments, including tools for improved data handling, user management, and workflow automation, which can be used for both backend and frontend tasks. This makes it a valuable resource for developers looking to build comprehensive solutions that incorporate Microsoft 365's ecosystem within TYPO3 projects, thereby boosting efficiency and productivity.
+Reusable helper traits and utilities for TYPO3 — including a Microsoft Graph mail conversion service that turns a Symfony `SentMessage` into a Graph-ready message object.
 
-### Branch `feature-typo3-9`
+## Features
 
-The `feature-typo3-9` branch of the "TYPO3 helpers" extension is specifically designed to support projects running on TYPO3 version 9. Recognizing the continued use of older TYPO3 versions in many environments, this branch ensures compatibility while still providing essential functions to integrate Microsoft Graph services. 
+- **Microsoft Graph mail conversion** — `MSGraphMailApiService::convertToGraphMessage()` parses a raw Symfony `SentMessage` (MIME) and builds a `Microsoft\Graph\Model\Message` ready to be sent through the Microsoft Graph `sendMail` endpoint.
+  - Maps **From**, **To**, **CC**, **BCC** and **Reply-To** recipients (name + address).
+  - Handles both **HTML** and **plain-text** bodies, with a sensible fallback.
+  - Converts **file attachments** to Graph `FileAttachment` objects (base64-encoded content bytes).
+  - Supports **inline images (cid:)** — inline parts are flagged with `isInline` and carry their original **Content-ID** so `cid:` references in the HTML body render correctly.
+- **`ReflectionPropertiesTrait`** — a reusable trait that provides dynamic `getX()` / `setX()` magic accessors for any class's properties via reflection.
 
-This branch is tailored for developers and organizations that need to work with TYPO3 9 due to infrastructure limitations, existing installations, or specific long-term support requirements. It retains the core functionalities of the extension, such as handling emails, calendar events, and contacts through the Microsoft Graph API, but adapts the implementation to function smoothly within the constraints of TYPO3 9. It optimizes the integration to ensure compatibility and stability, enabling the use of critical Microsoft 365 features even in environments where upgrades to newer TYPO3 versions are not immediately feasible.
+## Requirements
 
-By maintaining a dedicated branch for TYPO3 9, the "TYPO3 helpers" extension showcases a commitment to supporting a diverse range of TYPO3 users, regardless of the platform version they are using. This branch provides a practical solution for extending the life of existing projects while continuing to offer important productivity tools and API integrations. It serves as an essential resource for developers managing legacy TYPO3 systems, ensuring they can leverage Microsoft’s powerful suite of tools without requiring an upgrade to a newer TYPO3 version.
+- **TYPO3:** 10.4 LTS
+- **PHP:** 7.2 or higher
+- **Dependencies:**
+  - [`microsoft/microsoft-graph`](https://github.com/microsoftgraph/msgraph-sdk-php) `^1`
+  - [`zbateson/mail-mime-parser`](https://github.com/zbateson/mail-mime-parser) `^2`
+
+## Installation
+
+Install via Composer:
+
+```bash
+composer require oliverkroener/ok-typo3-helper
+```
+
+For local development with a path repository, add the following to your project's root `composer.json`:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/*"
+        }
+    ]
+}
+```
+
+Then require and activate the extension:
+
+```bash
+composer require oliverkroener/ok-typo3-helper:@dev
+vendor/bin/typo3 extension:activate ok_typo3_helper
+```
+
+## Usage
+
+### Convert a message for Microsoft Graph
+
+```php
+use OliverKroener\Helpers\MSGraphApi\MSGraphMailApiService;
+use Symfony\Component\Mailer\SentMessage;
+
+/** @var SentMessage $sentMessage */
+$result = MSGraphMailApiService::convertToGraphMessage($sentMessage);
+
+$graphMessage = $result['message']; // Microsoft\Graph\Model\Message
+$fromAddress  = $result['from'];    // string, the sender address
+
+// $graphMessage can now be passed to the Microsoft Graph "sendMail" request.
+```
+
+Inline images referenced in the HTML body via `cid:` are detected automatically from
+their `Content-Disposition: inline` header and carried over with their Content-ID, so
+embedded graphics render in the delivered mail.
+
+### Dynamic property accessors
+
+```php
+use OliverKroener\Helpers\Traits\ReflectionPropertiesTrait;
+
+class Contact
+{
+    use ReflectionPropertiesTrait;
+
+    private string $email = '';
+}
+
+$contact = new Contact();
+$contact->setEmail('ok@oliver-kroener.de'); // magic setter
+echo $contact->getEmail();                   // magic getter
+```
+
+## Development
+
+The extension ships with static analysis and coding-standards tooling:
+
+```bash
+composer run stan       # PHPStan (level 5, TYPO3 stubs)
+composer run cs:check   # PHP-CS-Fixer dry-run (TYPO3 coding standards)
+composer run cs:fix     # PHP-CS-Fixer apply
+```
+
+## License
+
+This extension is licensed under [GPL-2.0-or-later](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+
+## Author — Oliver Kroener
+
+### Automated. Scaled. Done.
+
+Web3 · Cloud · Automation
+
+Technology is only valuable when it solves a real problem. For over 30 years I've been translating between business and tech — so your investment in digitalisation doesn't stall at proof-of-concept but delivers measurable results.
+
+- Website: [oliver-kroener.de](https://www.oliver-kroener.de)
+- Web3: [web3.oliver-kroener.de](https://web3.oliver-kroener.de/)
+- Email: [ok@oliver-kroener.de](mailto:ok@oliver-kroener.de)
+- Web3 Email: [oliverkroener@ethermail.io](mailto:oliverkroener@ethermail.io)

@@ -3,3 +3,6 @@
 /composer.lock
 /.php-cs-fixer.cache
 /.phpstan.cache
+
+# TYPO3 rendered documentation output
+/Documentation-GENERATED-temp/

@@ -2,6 +2,19 @@
     "name": "oliverkroener/ok-typo3-helper",
     "type": "typo3-cms-extension",
     "description": "A TYPO3 extension with helper traits and utilities.",
+    "homepage": "https://www.oliver-kroener.de",
+    "keywords": [
+      "typo3",
+      "typo3-extension",
+      "microsoft-graph",
+      "microsoft-365",
+      "email",
+      "mailer",
+      "outlook",
+      "mime",
+      "helper",
+      "traits"
+    ],
     "authors": [
       {
         "name": "Oliver Kroener",
