@@ -5,6 +5,7 @@ $EM_CONF[$_EXTKEY] = [
     'category' => 'plugin',
     'author' => 'Oliver Kroener',
     'author_email' => 'ok@oliver-kroener.de',
+    'author_company' => 'https://www.oliver-kroener.de',
     'state' => 'stable',
     'version' => '3.1.0',
     'constraints' => [

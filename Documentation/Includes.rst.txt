@@ -1,0 +1,10 @@
+..  These are common definitions, reused throughout the manual.
+
+..  role:: bash(code)
+    :language: bash
+
+..  role:: php(code)
+    :language: php
+
+..  role:: typoscript(code)
+    :language: typoscript
