@@ -5,7 +5,7 @@
 [![TYPO3 14](https://img.shields.io/badge/TYPO3-14-orange?logo=typo3)](https://get.typo3.org/version/14)
 [![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-[![Version](https://img.shields.io/badge/version-3.1.0-green)](https://github.com/oliverkroener/ok_typo3_helper)
+[![Version](https://img.shields.io/badge/version-3.1.1-green)](https://github.com/oliverkroener/ok_typo3_helper)
 
 Reusable helper traits, services, and a Microsoft Graph mail converter that other Oliver Kröner TYPO3 extensions build on.
 
