@@ -19,7 +19,7 @@
     />
     <project title="TYPO3 Helpers"
              version="3.1"
-             release="3.1.1"
+             release="3.1.2"
              copyright="since 2024 by Oliver Kroener &amp; Contributors"/>
     <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"/>
 </guides>
